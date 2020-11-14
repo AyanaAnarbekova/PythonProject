@@ -30,8 +30,8 @@ img4=pygame.transform.scale(shield,(10,10))
 lazer2=pygame.image.load('images/lazer2.png')
 img5=pygame.transform.scale(lazer2,(20,20))
 
-lazer_sound=pygame.mixer.Sound('sounds/lazer_sound.wav')
-lazer_sound.set_volume(0.25)
+'''lazer_sound=pygame.mixer.Sound('sounds/lazer_sound.wav')
+lazer_sound.set_volume(0.25)'''
 
 class Spaceship(pygame.sprite.Sprite):
     def __init__(self):
@@ -87,9 +87,8 @@ class Lazer(pygame.sprite.Sprite):
             self.kill()
         if pygame.sprite.spritecollide(self, aliens_group, True):
             self.kill()
-            explosion=Explosion(self.rect.x,self.rect.y)
+            explosion=Explosion(self.rect.x,self.rect.top)
             explosion_group.add(explosion)
-            self.kill()
 
         if pygame.sprite.spritecollide(self, shields_group, True):
             self.kill()
@@ -155,6 +154,8 @@ class Alien_Bullet(pygame.sprite.Sprite):
              self.kill()
          if pygame.sprite.spritecollide(self, spaceship_group, False):
              self.kill()
+             explosion = Explosion(self.rect.x, self.rect.top)
+             explosion_group.add(explosion)
              spaceship.remaining_health-=1
          if pygame.sprite.spritecollide(self, shields_group, True):
              self.kill()
@@ -213,7 +214,7 @@ while play_game:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 spaceship.shoot()
-                lazer_sound.play()
+                '''lazer_sound.play()'''
 
     spaceship_group.draw(screen)
     lazer_group.draw(screen)
