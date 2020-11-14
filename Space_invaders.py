@@ -4,10 +4,11 @@ import random
 level = 1
 
 play_game = True
+pygame.mixer.init()
 
 fps = 30
 width = 750
-height = 750
+height = 700
 alien_cooldown = 500
 last_alien_shoot = pygame.time.get_ticks()
 rows = level*2+3
@@ -16,13 +17,26 @@ pygame.init()
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption('GALAXIAN')
 clock = pygame.time.Clock()
+background=pygame.image.load('images/background1_7.jpg')
+img = pygame.transform.scale(background,(750,800))
+spaceship=pygame.image.load('images/spaceship.png')
+img1=pygame.transform.scale(spaceship,(60,50))
+alien=pygame.image.load('images/alien(3).png')
+img2=pygame.transform.scale(alien,(50,40))
+lazer1=pygame.image.load('images/lazer1.png')
+img3=pygame.transform.scale(lazer1,(20,20))
+shield=pygame.image.load('images/solar_panels.png')
+img4=pygame.transform.scale(shield,(10,10))
+lazer2=pygame.image.load('images/lazer2.png')
+img5=pygame.transform.scale(lazer2,(20,20))
 
+lazer_sound=pygame.mixer.Sound('sounds/lazer_sound.wav')
+lazer_sound.set_volume(0.25)
 
 class Spaceship(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((30, 20))
-        self.image.fill((0, 0, 255))
+        self.image = img1
         self.rect = self.image.get_rect()
         self.rect.centerx = int(width / 2)
         self.rect.bottom = height - 50
@@ -41,9 +55,10 @@ class Spaceship(pygame.sprite.Sprite):
             self.rect.right = width
         elif self.rect.left < 0:
             self.rect.left = 0
-        pygame.draw.rect(screen, (0, 255, 0), (self.rect.x, (self.rect.bottom + 10), self.rect.width, 15))
+
+        pygame.draw.rect(screen, (255, 0, 0), (self.rect.x, (self.rect.bottom+5), self.rect.width, 10))
         if self.remaining_health > 0:
-            pygame.draw.rect(screen, (0, 255, 0), (self.rect.x, (self.rect.bottom + 10), int(self.rect.width * (self.remaining_health / self.initial_health)), 15))
+            pygame.draw.rect(screen, (0, 255, 0), (self.rect.x, (self.rect.bottom+5), int((self.rect.width) * (self.remaining_health / self.initial_health)), 10))
         if pygame.sprite.spritecollide(self, alien_bullet_group, True):
             self.remaining_health -= 1
         if self.remaining_health == 0:
@@ -60,8 +75,7 @@ class Spaceship(pygame.sprite.Sprite):
 class Lazer(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((10, 10))
-        self.image.fill((255, 0, 0))
+        self.image = img3
         self.rect = self.image.get_rect()
         self.rect.centerx = x
         self.rect.bottom = y
@@ -73,6 +87,10 @@ class Lazer(pygame.sprite.Sprite):
             self.kill()
         if pygame.sprite.spritecollide(self, aliens_group, True):
             self.kill()
+            explosion=Explosion(self.rect.x,self.rect.y)
+            explosion_group.add(explosion)
+            self.kill()
+
         if pygame.sprite.spritecollide(self, shields_group, True):
             self.kill()
 
@@ -80,8 +98,7 @@ class Lazer(pygame.sprite.Sprite):
 class Aliens(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((40, 20))
-        self.image.fill((0, 255, 0))
+        self.image = img2
         self.rect = self.image.get_rect()
         self.rect.center = [x, y]
         self.move_direction = 1
@@ -97,14 +114,37 @@ class Aliens(pygame.sprite.Sprite):
 
     def collide(self):
         if pygame.sprite.spritecollide(self, shields_group, True):
-            self.stay()
+            self.kill()
+
+class Explosion(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.explosion = []
+        for i in range(1,6):
+            img = pygame.image.load(f'images/exp{i}.png')
+            img = pygame.transform.scale(img, (i*5,i*5))
+            self.explosion.append(img)
+        self.index = 0
+        self.image = self.explosion[self.index]
+        self.rect = self.image.get_rect()
+        self.rect.center = [x,y]
+        self.counter = 0
+
+    def update(self):
+        explosion_speed = 3
+        self.counter += 1
+        if self.counter >= explosion_speed and self.index < len(self.explosion) - 1:
+            self.counter = 0
+            self.index += 1
+            self.image = self.explosion[self.index]
+        if self.index >= len(self.explosion) - 1 and self.counter >= explosion_speed:
+            self.kill()
 
 
 class Alien_Bullet(pygame.sprite.Sprite):
      def __init__(self, x, y):
          pygame.sprite.Sprite.__init__(self)
-         self.image = pygame.Surface((10, 10))
-         self.image.fill((0, 255, 0))
+         self.image = img5
          self.rect = self.image.get_rect()
          self.rect.center = [x,y]
          self.speedy = 15
@@ -113,16 +153,16 @@ class Alien_Bullet(pygame.sprite.Sprite):
          self.rect.y += self.speedy
          if self.rect.top > height:
              self.kill()
-         if pygame.sprite.spritecollide(self, spaceship_group, True):
+         if pygame.sprite.spritecollide(self, spaceship_group, False):
              self.kill()
+             spaceship.remaining_health-=1
          if pygame.sprite.spritecollide(self, shields_group, True):
              self.kill()
 
 class Shields(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((10, 10))
-        self.image.fill((0, 255, 0))
+        self.image = img4
         self.rect = self.image.get_rect()
 
     def update(self):
@@ -130,14 +170,14 @@ class Shields(pygame.sprite.Sprite):
             self.kill()
 
 
-spaceship_group = pygame.sprite.Group()
+spaceship_group=pygame.sprite.Group()
 spaceship = Spaceship()
 spaceship_group.add(spaceship)
 lazer_group = pygame.sprite.Group()
 aliens_group = pygame.sprite.Group()
 shields_group = pygame.sprite.Group()
 alien_bullet_group = pygame.sprite.Group()
-
+explosion_group=pygame.sprite.Group()
 def create_aliens():
     for row in range(1, rows):
         for column in range(1, 11):
@@ -157,6 +197,8 @@ for shield in range(4):
 while play_game:
     clock.tick(fps)
     screen.fill((0, 0, 0))
+    screen.blit(img,(0,0))
+
 
     time_now = pygame.time.get_ticks()
     if time_now - last_alien_shoot > alien_cooldown:
@@ -171,18 +213,21 @@ while play_game:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 spaceship.shoot()
+                lazer_sound.play()
 
     spaceship_group.draw(screen)
     lazer_group.draw(screen)
     aliens_group.draw(screen)
     shields_group.draw(screen)
     alien_bullet_group.draw(screen)
+    explosion_group.draw(screen)
 
     spaceship_group.update()
     lazer_group.update()
     aliens_group.update()
     shields_group.update()
     alien_bullet_group.update()
-
+    explosion_group.update()
     pygame.display.update()
 pygame.quit()
+
