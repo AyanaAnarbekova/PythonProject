@@ -30,7 +30,7 @@ shield = pygame.image.load('images/solar_panels.png')
 img4 = pygame.transform.scale(shield, (10, 10))
 lazer2 = pygame.image.load('images/lazer2.png')
 img5 = pygame.transform.scale(lazer2, (20, 20))
-boss = pygame.image.load('images/boss.png')
+boss = pygame.image.load('images/boss2.png')
 img6 = pygame.transform.scale(boss, (500, 200))
 
 pygame.mixer.music.load('sounds/background_music.mp3')
@@ -39,9 +39,7 @@ pygame.mixer.music.set_volume(0.20)
 lazer_sound = pygame.mixer.Sound('sounds/lazer_sound.mp3')
 lazer_sound.set_volume(0.25)
 explosion1_sound = pygame.mixer.Sound('sounds/explosion1_sound.mp3')
-explosion1_sound.set_volume(0.20)
-sunpanels_sound = pygame.mixer.Sound('sounds/sun_panel_sound.mp3')
-sunpanels_sound.set_volume(0.15)
+explosion1_sound.set_volume(0.15)
 alienbullet_sound = pygame.mixer.Sound('sounds/aliens_bullet_sound.mp3')
 alienbullet_sound.set_volume(0.15)
 
@@ -174,7 +172,7 @@ class Alien_Bullet(pygame.sprite.Sprite):
             spaceship.remaining_health -= 1
         if pygame.sprite.spritecollide(self, shields_group, True):
             self.kill()
-            sunpanels_sound.play()
+
 
 class Shields(pygame.sprite.Sprite):
     def __init__(self):
@@ -234,7 +232,7 @@ explosion_group = pygame.sprite.Group()
 boss_group = pygame.sprite.Group()
 boss_bullets_group = pygame.sprite.Group()
 boss=Boss()
-boss_group.add(boss)
+
 
 def create_aliens(a):
     for row in range(1, a):
@@ -295,6 +293,7 @@ def start():
             shields_group.update()
             alien_bullet_group.update()
         else:
+            boss_group.add(boss)
             boss_group.draw(screen)
             boss_bullets_group.draw(screen)
             boss_group.update()
@@ -306,7 +305,7 @@ def start():
         elif len(boss_group) == 0 and level == 5:
             play_game1 = False
 
-'''create_aliens(5)
+create_aliens(5)
 spaceship.remaining_health = spaceship.initial_health
 level = 1
 for shield in range(4):
@@ -358,7 +357,8 @@ for shield in range(1):
             shields.rect.x = (290 + (195 * shield)) + (10 * column)
             shields.rect.y = 500 + (10 * row)
             shields_group.add(shields)
-start()'''
+start()
+
 level = 5
 spaceship.remaining_health = spaceship.initial_health
 fps = 60
