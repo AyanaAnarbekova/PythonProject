@@ -54,8 +54,8 @@ class Spaceship(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.centerx = int(width / 2)
         self.rect.bottom = height - 50
-        self.initial_health = 20
-        self.remaining_health = 20
+        self.initial_health = 200
+        self.remaining_health = 200
 
     def update(self):
         global play_game
@@ -86,7 +86,7 @@ class Spaceship(pygame.sprite.Sprite):
                 screen.blit(text1, (200, 430))
                 pygame.display.update()
                 i = i + 1
-        play_game = False
+            play_game = False
 
     def shoot(self):
         lazer = Lazer(self.rect.centerx, self.rect.top)
@@ -111,6 +111,7 @@ class Lazer(pygame.sprite.Sprite):
             self.kill()
             explosion = Explosion(self.rect.x, self.rect.top)
             explosion_group.add(explosion)
+            explosion1_sound.play()
         if pygame.sprite.spritecollide(self, shields_group, True):
             self.kill()
 
@@ -191,48 +192,6 @@ class Shields(pygame.sprite.Sprite):
         if pygame.sprite.spritecollide(self, aliens_group, False):
             self.kill()
 
-class Boss(pygame.sprite.Sprite):
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = img6
-        self.rect = self.image.get_rect()
-        self.rect.centerx = int(width/2)
-        self.rect.centery = int(height/2 - 300)
-        self.health = 10
-        self.remaining_health = 10
-        self.move_direction=1
-        self.move_counter=0
-    def update(self):
-        pygame.draw.rect(screen, (255, 0, 0), (self.rect.x, (self.rect.bottom -90), self.rect.width, 10))
-        if self.remaining_health > 0:
-            pygame.draw.rect(screen, (0, 255, 0), (self.rect.x, (self.rect.bottom -90),
-                int((self.rect.width) * (self.remaining_health / self.health)),
-                10))
-        if pygame.sprite.spritecollide(self, lazer_group, True):
-            self.remaining_health -= 1
-        if self.remaining_health == 0:
-            self.kill()
-        self.rect.x += 4*self.move_direction
-        self.move_counter += 4
-        if abs(self.move_counter) > 275:
-            self.move_direction *= -1
-            self.move_counter *= self.move_direction
-
-class Boss_Bullets(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = img5
-        self.rect = self.image.get_rect()
-        self.rect.center = [x, y]
-        self.speedy = 20
-
-    def update(self):
-        self.rect.y += self.speedy
-        if self.rect.top > height:
-            self.kill()
-        if pygame.sprite.spritecollide(self, spaceship_group, False):
-            self.kill()
-            spaceship.remaining_health -= 1
 
 spaceship_group = pygame.sprite.Group()
 spaceship = Spaceship()
@@ -242,54 +201,50 @@ aliens_group = pygame.sprite.Group()
 shields_group = pygame.sprite.Group()
 alien_bullet_group = pygame.sprite.Group()
 explosion_group = pygame.sprite.Group()
-boss_group = pygame.sprite.Group()
-boss_bullets_group = pygame.sprite.Group()
-boss = Boss()
-boss_group.add(boss)
 
 
-
-def create_aliens(a, x, y):
+def create_aliens(a):
     for row in range(1, a):
         for column in range(1, 11):
-            alien = Aliens((x + (50 * column)), (y + (50 * row)))
+            alien = Aliens((80 + (50 * column)), (30 + (50 * row)))
             aliens_group.add(alien)
 
 
 def count(s):
-    global play_game
     screen.blit(img, (0, 0))
-    for i in range(500):
-        f1 = pygame.font.SysFont('serif', 56)
-        text1 = f1.render(s, True, (255, 255, 255))
-        screen.blit(text1, (300, 300))
-        pygame.display.update()
-        i = i + 1
-    screen.blit(img, (0, 0))
-    for i in range(500):
-        f1 = pygame.font.SysFont('serif', 56)
-        text1 = f1.render('3', True, (255, 255, 255))
-        screen.blit(text1, (350, 300))
-        pygame.display.update()
-        i = i + 1
-    screen.blit(img, (0, 0))
-    for i in range(500):
-        f1 = pygame.font.SysFont('serif', 56)
-        text1 = f1.render('2', True, (255, 255, 255))
-        screen.blit(text1, (350, 300))
-        pygame.display.update()
-        i = i + 1
-    screen.blit(img, (0, 0))
-    for i in range(500):
-        f1 = pygame.font.SysFont('serif', 56)
-        text1 = f1.render('1', True, (255, 255, 255))
-        screen.blit(text1, (350, 300))
-        pygame.display.update()
-        i = i + 1
+    if spaceship.remaining_health != 0:
+        for i in range(500):
+            f1 = pygame.font.SysFont('serif', 56)
+            text1 = f1.render(s, True, (255, 255, 255))
+            screen.blit(text1, (300, 300))
+            pygame.display.update()
+            i = i + 1
+        screen.blit(img, (0, 0))
+        for i in range(500):
+            f1 = pygame.font.SysFont('serif', 56)
+            text1 = f1.render('3', True, (255, 255, 255))
+            screen.blit(text1, (350, 300))
+            pygame.display.update()
+            i = i + 1
+        screen.blit(img, (0, 0))
+        for i in range(500):
+            f1 = pygame.font.SysFont('serif', 56)
+            text1 = f1.render('2', True, (255, 255, 255))
+            screen.blit(text1, (350, 300))
+            pygame.display.update()
+            i = i + 1
+        screen.blit(img, (0, 0))
+        for i in range(500):
+            f1 = pygame.font.SysFont('serif', 56)
+            text1 = f1.render('1', True, (255, 255, 255))
+            screen.blit(text1, (350, 300))
+            pygame.display.update()
+            i = i + 1
 
 
-def start():
+def start(s):
     global play_game, last_alien_shoot
+    count(s)
     play_game1 = play_game
     while play_game1:
         clock.tick(fps)
@@ -301,22 +256,6 @@ def start():
             alien_bullet_group.add(alien_bullet)
             last_alien_shoot = time_now
 
-        if level == 5:
-            if time_now - last_alien_shoot > alien_cooldown:
-                if len(aliens_group) == 0:
-                    if spaceship.rect.x >= boss.rect.left and spaceship.rect.x <= boss.rect.right:
-                        boss_bullet = Boss_Bullets(spaceship.rect.x, boss.rect.bottom)
-                        boss_bullets_group.add(boss_bullet)
-                        '''alienbullet_sound.play()'''
-                    elif spaceship.rect.x <= boss.rect.left:
-                        boss_bullet = Boss_Bullets(boss.rect.x, boss.rect.bottom)
-                        boss_bullets_group.add(boss_bullet)
-                        '''alienbullet_sound.play()'''
-                    elif spaceship.rect.x >= boss.rect.right:
-                        boss_bullet = Boss_Bullets(boss.rect.right, boss.rect.bottom)
-                        boss_bullets_group.add(boss_bullet)
-                last_alien_shoot = pygame.time.get_ticks()
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 play_game = False
@@ -324,9 +263,12 @@ def start():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     spaceship.shoot()
+                    lazer_sound.play()
+
         if spaceship.remaining_health == 0:
             play_game = False
             play_game1 = False
+
         spaceship_group.draw(screen)
         lazer_group.draw(screen)
         aliens_group.draw(screen)
@@ -342,16 +284,7 @@ def start():
         explosion_group.update()
         pygame.display.update()
 
-        if level == 5:
-            boss_group.add(boss)
-            boss_group.draw(screen)
-            boss_bullets_group.draw(screen)
-            boss_group.update()
-            boss_bullets_group.update()
-
-        if len(aliens_group) == 0 and level != 5:
-            play_game1 = False
-        elif len(boss_group) == 0 and level == 5:
+        if len(aliens_group) == 0:
             play_game1 = False
 
 
@@ -364,8 +297,9 @@ for i in range(700):
     i = i + 1
 screen.blit(img, (0, 0))
 
-count('Level 1')
-create_aliens(5, 80, 30)
+# count('Level 1')
+
+create_aliens(5)
 for shield in range(4):
     for row in range(5):
         for column in range(10):
@@ -373,10 +307,9 @@ for shield in range(4):
             shields.rect.x = (50 + (195 * shield)) + (10 * column)
             shields.rect.y = 500 + (10 * row)
             shields_group.add(shields)
-start()
-count('Level 2')
+start('Level 1')
 
-create_aliens(7, 80, 30)
+create_aliens(7)
 fps = 45
 alien_cooldown = 400
 for shield in range(4):
@@ -386,11 +319,9 @@ for shield in range(4):
             shields.rect.x = (50 + (195 * shield)) + (10 * column)
             shields.rect.y = 500 + (10 * row)
             shields_group.add(shields)
-start()
+start('Level 2')
 
-count('Level 3')
-
-create_aliens(9, 80, 30)
+create_aliens(9)
 fps = 60
 alien_cooldown = 300
 for shield in range(4):
@@ -400,11 +331,9 @@ for shield in range(4):
             shields.rect.x = (50 + (195 * shield)) + (10 * column)
             shields.rect.y = 500 + (10 * row)
             shields_group.add(shields)
-start()
+start('Level 3')
 
-count('Level 4')
-
-create_aliens(9, 80, 30)
+create_aliens(9)
 fps = 60
 alien_cooldown = 200
 for shield in range(1):
@@ -414,23 +343,7 @@ for shield in range(1):
             shields.rect.x = (290 + (195 * shield)) + (10 * column)
             shields.rect.y = 500 + (10 * row)
             shields_group.add(shields)
-start()
-
-count ('Boss')
-
-level = 5
-create_aliens(7, 80, 150)
-spaceship.remaining_health = spaceship.initial_health
-fps = 60
-alien_cooldown = 500
-for shield in range(4):
-    for row in range(3):
-        for column in range(10):
-            shields = Shields()
-            shields.rect.x = (50 + (195 * shield)) + (10 * column)
-            shields.rect.y = 500 + (10 * row)
-            shields_group.add(shields)
-start()
+start('Level 4')
 
 if spaceship.remaining_health != 0:
     screen.blit(img6, (0, 0))
@@ -440,7 +353,5 @@ if spaceship.remaining_health != 0:
         screen.blit(text1, (120, 400))
         pygame.display.update()
         i = i + 1
-
-
 
 pygame.quit()
