@@ -35,7 +35,7 @@ lose = pygame.image.load('images/lose.png')
 img7 = pygame.transform.scale(lose, (750, 800))
 img8 = pygame.transform.scale(alien, (200, 100))
 
-'''pygame.mixer.music.load('sounds/background_music.mp3')
+pygame.mixer.music.load('sounds/background_music.mp3')
 pygame.mixer.music.play(-1)
 pygame.mixer.music.set_volume(0.20)
 lazer_sound = pygame.mixer.Sound('sounds/lazer_sound.mp3')
@@ -45,7 +45,7 @@ explosion1_sound.set_volume(0.25)
 sunpanels_sound = pygame.mixer.Sound('sounds/sun_panel_sound.mp3')
 sunpanels_sound.set_volume(0.25)
 alienbullet_sound = pygame.mixer.Sound('sounds/aliens_bullet_sound.mp3')
-alienbullet_sound.set_volume(0.15)'''
+alienbullet_sound.set_volume(0.15)
 
 
 class Spaceship(pygame.sprite.Sprite):
@@ -112,7 +112,7 @@ class Lazer(pygame.sprite.Sprite):
             self.kill()
             explosion = Explosion(self.rect.x, self.rect.top)
             explosion_group.add(explosion)
-            '''explosion1_sound.play()'''
+            explosion1_sound.play()
         if pygame.sprite.spritecollide(self, shields_group, True):
             self.kill()
 
@@ -310,11 +310,11 @@ def start(s):
                     if spaceship.rect.x >= boss.rect.left and spaceship.rect.x <= boss.rect.right:
                         boss_bullet = Boss_Bullets(spaceship.rect.x, boss.rect.bottom)
                         boss_bullets_group.add(boss_bullet)
-                        '''alienbullet_sound.play()'''
+                        alienbullet_sound.play()
                     elif spaceship.rect.x <= boss.rect.left:
                         boss_bullet = Boss_Bullets(boss.rect.x, boss.rect.bottom)
                         boss_bullets_group.add(boss_bullet)
-                        '''alienbullet_sound.play()'''
+                        alienbullet_sound.play()
                     elif spaceship.rect.x >= boss.rect.right:
                         boss_bullet = Boss_Bullets(boss.rect.right, boss.rect.bottom)
                         boss_bullets_group.add(boss_bullet)
@@ -333,7 +333,7 @@ def start(s):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     spaceship.shoot()
-                    '''lazer_sound.play()'''
+                    lazer_sound.play()
 
         if spaceship.remaining_health == 0:
             play_game = False
