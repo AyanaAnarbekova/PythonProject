@@ -5,6 +5,7 @@ import sys
 pygame.font.init()
 level = 1
 play_game = True
+game_over = False
 
 fps = 30
 width = 750
@@ -55,8 +56,8 @@ class Spaceship(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.centerx = int(width / 2)
         self.rect.bottom = height - 50
-        self.initial_health = 200
-        self.remaining_health = 200
+        self.initial_health = 100
+        self.remaining_health = 100
 
     def update(self):
         global play_game
@@ -200,8 +201,8 @@ class Boss(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.centerx = int(width/2)
         self.rect.centery = int(height/2 - 300)
-        self.health = 10
-        self.remaining_health = 10
+        self.health = 50
+        self.remaining_health = 50
         self.move_direction=1
         self.move_counter=0
     def update(self):
@@ -290,7 +291,7 @@ def count(s):
 
 
 def start(s):
-    global play_game, last_alien_shoot
+    global play_game, last_alien_shoot, game_over
     count(s)
     play_game1 = play_game
     while play_game1:
@@ -330,6 +331,7 @@ def start(s):
             if event.type == pygame.QUIT:
                 play_game = False
                 play_game1 = False
+                pygame.quit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     spaceship.shoot()
@@ -338,6 +340,7 @@ def start(s):
         if spaceship.remaining_health == 0:
             play_game = False
             play_game1 = False
+            game_over = True
 
         spaceship_group.draw(screen)
         lazer_group.draw(screen)
@@ -416,18 +419,19 @@ for shield in range(1):
             shields_group.add(shields)
 start('Level 4')
 
-create_aliens(7, 80, 150)
-spaceship.remaining_health = spaceship.initial_health
-fps = 60
-alien_cooldown = 500
-for shield in range(4):
-    for row in range(3):
-        for column in range(10):
-            shields = Shields()
-            shields.rect.x = (50 + (195 * shield)) + (10 * column)
-            shields.rect.y = 500 + (10 * row)
-            shields_group.add(shields)
-start('Boss')
+if not game_over:
+    create_aliens(7, 80, 150)
+    spaceship.remaining_health = spaceship.initial_health
+    fps = 60
+    alien_cooldown = 500
+    for shield in range(4):
+        for row in range(3):
+            for column in range(10):
+                shields = Shields()
+                shields.rect.x = (50 + (195 * shield)) + (10 * column)
+                shields.rect.y = 500 + (10 * row)
+                shields_group.add(shields)
+    start('Boss')
 
 
 if spaceship.remaining_health != 0:
